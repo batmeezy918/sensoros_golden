@@ -1,29 +1,30 @@
-name: Android Cloud Build
+name: Golden SensorOS Build
 
-on: [push]
+on:
+  push:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
         with:
-          java-version: 17
-          distribution: 'temurin'
+          channel: stable
 
-      - name: Install Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Create Flutter Base
+        run: |
+          flutter create .
+          flutter pub get
 
       - name: Build APK
-        run: |
-          chmod +x gradlew || true
-          ./gradlew assembleRelease
+        run: flutter build apk --release
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: sensoros-apk
-          path: app/build/outputs/apk/release/app-release.apk
+          path: build/app/outputs/flutter-apk/app-release.apk
